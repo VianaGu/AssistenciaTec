@@ -1,0 +1,230 @@
+/* ===== Reset base ===== */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: #f4f6fa;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== Header ===== */
+header {
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  color: #fff;
+  padding: 1rem 2rem;
+}
+
+header h1 {
+  font-size: 2rem;
+}
+
+header p {
+  font-size: 0.875rem;
+  color: #e0e7ff;
+}
+
+/* ===== Layout principal ===== */
+.main-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+form {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  padding: 2rem;
+  width: 100%;
+  max-width: 1200px;
+}
+
+/* ===== Inputs e textareas ===== */
+input[type="text"],
+input[type="date"],
+input,
+textarea {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  transition: all 0.2s;
+  width: 100%;
+  font-size: 0.875rem;
+}
+
+input:focus,
+textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+  outline: none;
+}
+
+label {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+/* ===== Botões ===== */
+button {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button.bg-blue-600 {
+  background-color: #3b82f6;
+  color: #fff;
+  font-weight: 600;
+}
+
+button.border {
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #111;
+}
+
+button.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+button.py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+/* ===== Checklist ===== */
+.checklist {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.checklist div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 2px 0;
+}
+
+.checklist input[type="radio"] {
+  accent-color: #3b82f6;
+}
+
+/* ===== Padrão de desbloqueio ===== */
+.relative {
+  touch-action: none;
+}
+
+.grid-cols-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  width: 9rem;
+  height: 9rem;
+  position: relative;
+  user-select: none;
+}
+
+.grid-cols-3 div {
+  width: 30px;
+  height: 30px;
+  border: 2px solid #ccc;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: #fff;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.grid-cols-3 div.bg-blue-600 {
+  background-color: #2563eb;
+  color: white;
+  transform: scale(1.1);
+}
+
+.grid-cols-3 div span {
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+
+.PadraoDesbloqueioAvancado div {
+  transition: all 0.15s;
+}
+
+.PadraoDesbloqueioAvancado div:hover {
+  transform: scale(1.1);
+  background-color: #2563eb;
+  color: white;
+}
+
+/* ===== Linhas SVG ===== */
+svg line {
+  stroke: #2563eb;
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: all 0.1s linear;
+}
+
+/* ===== Footer ===== */
+footer {
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+/* ===== Impressão ===== */
+@media print {
+  body { color:#111; padding:20px; font-family:Arial,Helvetica,sans-serif; }
+  h1 { font-size:20px; margin-bottom:8px }
+  table { width:100%; border-collapse:collapse; margin-top:8px }
+  td,th { border:1px solid #ccc; padding:6px; text-align:left }
+  .checklist { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .small { font-size:12px; }
+  .row { display:flex; gap:12px; }
+  .col { flex:1; }
+  .label { font-weight:600; }
+}
+
+/* ===== Responsividade ===== */
+@media (max-width: 1024px) {
+  form {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .grid-cols-12 {
+    grid-template-columns: repeat(1, 1fr);
+  }
+  .col-span-6,
+  .col-span-12,
+  .col-span-3,
+  .col-span-4 {
+    grid-column: span 1 / span 1;
+  }
+  .flex.items-end.justify-end.gap-3 {
+    justify-content: flex-start;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .checklist {
+    grid-template-columns: 1fr; /* mobile: 1 coluna */
+  }
+}
