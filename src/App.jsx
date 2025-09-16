@@ -10,32 +10,18 @@ const PadraoDesbloqueioAvancado = React.forwardRef(({ value, onChange, className
     }).filter(x => x !== null);
   };
 
-  const buildLinesFromPattern = (p) => {
-    const l = [];
-    for (let i = 1; i < p.length; i++) l.push({ from: p[i - 1], to: p[i] });
-    return l;
-  };
-
   const [pattern, setPattern] = useState(() => parse(value));
-  const [lines, setLines] = useState(() => buildLinesFromPattern(parse(value)));
   const containerRef = useRef(null);
   const isDrawing = useRef(false);
   const lastDot = useRef(null);
   const dotRefs = useRef([]);
 
-  // Sincroniza prop -> estado interno (robusto contra valores vazios)
   useEffect(() => {
-    const p = parse(value);
-    setPattern(p);
-    setLines(buildLinesFromPattern(p));
+    setPattern(parse(value));
   }, [value]);
 
-  // expõe método clear para o pai
   useImperativeHandle(ref, () => ({
-    clear: () => {
-      setPattern([]);
-      setLines([]);
-    },
+    clear: () => setPattern([]),
     getPattern: () => pattern.slice()
   }), [pattern]);
 
@@ -43,9 +29,6 @@ const PadraoDesbloqueioAvancado = React.forwardRef(({ value, onChange, className
     e?.preventDefault();
     if (!pattern.includes(index)) {
       setPattern(prev => [...prev, index]);
-      if (lastDot.current != null) {
-        setLines(prev => [...prev, { from: lastDot.current, to: index }]);
-      }
       lastDot.current = index;
       isDrawing.current = true;
     }
@@ -64,11 +47,7 @@ const PadraoDesbloqueioAvancado = React.forwardRef(({ value, onChange, className
       const dotY = dotRect.top + dotRect.height / 2 - rect.top;
       const distance = Math.hypot(dotX - x, dotY - y);
       if (distance < 20 && !pattern.includes(i)) {
-        setPattern(prev => {
-          const next = [...prev, i];
-          return next;
-        });
-        setLines(prev => [...prev, { from: lastDot.current, to: i }]);
+        setPattern(prev => [...prev, i]);
         lastDot.current = i;
       }
     });
@@ -84,7 +63,7 @@ const PadraoDesbloqueioAvancado = React.forwardRef(({ value, onChange, className
 
   return (
     <div
-      className={className + " relative grid grid-cols-3 gap-2 select-none"}
+      className={className + " PadraoDesbloqueioAvancado"}
       ref={containerRef}
       onMouseMove={moveDrawing}
       onMouseUp={endDrawing}
@@ -93,26 +72,29 @@ const PadraoDesbloqueioAvancado = React.forwardRef(({ value, onChange, className
       onTouchEnd={endDrawing}
       onTouchCancel={endDrawing}
     >
-      {Array.from({ length: 9 }, (_, i) => {
-        const order = pattern.indexOf(i) + 1;
-        return (
-          <div
-            key={i}
-            ref={el => dotRefs.current[i] = el}
-            onMouseDown={(e) => startDrawing(i, e)}
-            onTouchStart={(e) => startDrawing(i, e)}
-            className={`w-10 h-10 rounded-full border-2 flex items-center justify-center cursor-pointer ${
-              pattern.includes(i) ? "bg-blue-600 text-white" : "bg-white text-black"
-            }`}
-          >
-            {order > 0 && <span className="text-xs font-bold">{order}</span>}
-          </div>
-        );
-      })}
-      <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
-        {lines.map((line, idx) => {
-          const fromRef = dotRefs.current[line.from];
-          const toRef = dotRefs.current[line.to];
+      <div className="grid-cols-3">
+        {Array.from({ length: 9 }, (_, i) => {
+          const order = pattern.indexOf(i) + 1;
+          return (
+            <div
+              key={i}
+              ref={el => dotRefs.current[i] = el}
+              onMouseDown={(e) => startDrawing(i, e)}
+              onTouchStart={(e) => startDrawing(i, e)}
+              className={pattern.includes(i) ? "bg-blue-600" : ""}
+            >
+              {order > 0 && <span>{order}</span>}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Linhas apenas na impressão */}
+      <svg className="line-print">
+        {pattern.length > 1 && pattern.map((p, idx, arr) => {
+          if (idx === 0) return null;
+          const fromRef = dotRefs.current[arr[idx - 1]];
+          const toRef = dotRefs.current[arr[idx]];
           if (!fromRef || !toRef || !containerRef.current) return null;
           const rect = containerRef.current.getBoundingClientRect();
           const fromRect = fromRef.getBoundingClientRect();
@@ -179,14 +161,12 @@ export default function AssistenciaTecnicaForm() {
     });
     localStorage.setItem("lastOrderNumber", String(newOrder));
     setChecklist(initialChecklist.reduce((acc, key) => { acc[key] = "nâo"; return acc; }, {}));
-    // limpa também o componente do padrão
     padraoRef.current?.clear();
   }
 
   function limparPadraoDesbloqueio(e) {
     e?.preventDefault();
     setForm(s => ({ ...s, padraoDesbloqueio: "" }));
-    // chama clear diretamente no componente filho (mais confiável)
     padraoRef.current?.clear();
   }
 
@@ -226,8 +206,7 @@ export default function AssistenciaTecnicaForm() {
       return `<svg width="${spacing*gridSize+spacing}" height="${spacing*gridSize+spacing}">${svgLines}${svgCircles}</svg>`;
     };
 
-    const style = `
-      body{font-family: Arial,Helvetica,sans-serif;padding:20px;color:#111}
+    const style = `body{font-family: Arial,Helvetica,sans-serif;padding:20px;color:#111}
       h1{font-size:20px;margin-bottom:8px}
       .row{display:flex;gap:12px}
       .col{flex:1}
@@ -235,15 +214,14 @@ export default function AssistenciaTecnicaForm() {
       table{width:100%;border-collapse:collapse;margin-top:8px}
       td,th{border:1px solid #ccc;padding:6px;text-align:left}
       .checklist{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-      .small{font-size:12px;}
-    `;
+      .small{font-size:12px};`;
 
     const checklistHtml = Object.entries(checklist)
       .map(([k,v]) => `<div style="display:flex;gap:10px;align-items:center"><div style="width:220px">${k}</div><div><strong>${v==='sim'?'SIM':'NÃO'}</strong></div></div>`).join("");
 
     const html = `
       <html>
-        <head><title>Ordem de Serviço - ${form.nome||"sem-nome"}</title><style>${style}</style></head>
+        <head><title>Ordem de Serviço - ${form.nome||""}</title><style>${style}</style></head>
         <body>
           <h1>ASSISTÊNCIA TÉCNICA</h1>
           <div class="row">
@@ -282,99 +260,117 @@ export default function AssistenciaTecnicaForm() {
         <p className="text-sm">Ordem de serviço</p>
       </header>
 
-      <div className="main-container">
-        <form className="bg-white p-6 border border-gray-200 w-full max-w-6xl">
+      <div className="main-container flex-1 overflow-auto p-4">
+        <form className="bg-white p-6 border border-gray-200 w-full max-w-6xl mx-auto space-y-4">
+
+          {/* Dados do cliente */}
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-3">
-              <label className="block text-sm font-semibold">Ordem Nº</label>
-              <input name="ordemNumero" value={form.ordemNumero} readOnly className="w-full border rounded p-2 bg-gray-100" />
+              <label className="block font-semibold">Ordem Nº</label>
+              <input type="text" className="border p-1 w-full" value={form.ordemNumero} readOnly />
             </div>
             <div className="col-span-3">
-              <label className="block text-sm font-semibold">Data</label>
-              <input type="date" name="data" value={form.data} onChange={handleFormChange} className="w-full border rounded p-2" />
+              <label className="block font-semibold">Data</label>
+              <input type="date" name="data" value={form.data} onChange={handleFormChange} className="border p-1 w-full"/>
             </div>
             <div className="col-span-6">
-              <label className="block text-sm font-semibold">Nome</label>
-              <input name="nome" value={form.nome} onChange={handleFormChange} className="w-full border rounded p-2" />
-            </div>
-
-            <div className="col-span-4">
-              <label className="block text-sm font-semibold">RG/CPF</label>
-              <input name="rgcpf" value={form.rgcpf} onChange={handleFormChange} className="w-full border rounded p-2" />
-            </div>
-            <div className="col-span-4">
-              <label className="block text-sm font-semibold">Telefone</label>
-              <input name="telefone" value={form.telefone} onChange={handleFormChange} className="w-full border rounded p-2" />
-            </div>
-            <div className="col-span-4 flex items-end">
-              <label className="inline-flex items-center gap-2">
-                <span className="text-sm">É WhatsApp?</span>
-                <input id="Whatsapp-checkbox" type="checkbox" name="whatsapp" checked={form.whatsapp} onChange={handleFormChange} />
-              </label>
-            </div>
-
-            <div className="col-span-12">
-              <label className="block text-sm font-semibold">Endereço</label>
-              <input name="endereco" value={form.endereco} onChange={handleFormChange} className="w-full border rounded p-2" />
-            </div>
-
-            <div className="col-span-6">
-              <label className="block text-sm font-semibold">IMEI</label>
-              <input name="imei" value={form.imei} onChange={handleFormChange} className="w-full border rounded p-2" />
-            </div>
-            <div className="col-span-6">
-              <label className="block text-sm font-semibold">Modelo</label>
-              <input name="modelo" value={form.modelo} onChange={handleFormChange} className="w-full border rounded p-2" />
-            </div>
-
-            <div className="col-span-6">
-              <label className="block text-sm font-semibold">Senha de desbloqueio</label>
-              <input name="senhaDesbloqueio" value={form.senhaDesbloqueio} onChange={handleFormChange} className="w-full border rounded p-2" />
-            </div>
-            <div className="col-span-6">
-              <label className="block text-sm font-semibold">Padrão de desbloqueio</label>
-              <PadraoDesbloqueioAvancado
-                ref={padraoRef}
-                className="PadraoDesbloqueioAvancado"
-                value={form.padraoDesbloqueio}
-                onChange={val => setForm(f => ({ ...f, padraoDesbloqueio: val }))}
-              />
-              <button type="button" className="bg-blue-600 text-white px-4 py-2 rounded mt-2" onClick={limparPadraoDesbloqueio}>Limpar padrão</button>
-            </div>
-
-            <div className="col-span-12">
-              <h2 className="font-semibold text-lg mt-2">Checklist</h2>
-              <div className="checklist">
-                {initialChecklist.map(item => (
-                  <div key={item} className="flex items-center gap-3 py-1">
-                    <div>{item}</div>
-                    <label className="inline-flex items-center gap-2">
-                      <input type="radio" name={item} checked={checklist[item]==='sim'} onChange={()=>toggleChecklist(item,'sim')} />SIM
-                    </label>
-                    <label className="inline-flex items-center gap-2 ml-4">
-                      <input type="radio" name={item} checked={checklist[item]==='nâo'} onChange={()=>toggleChecklist(item,'nâo')} />NÃO
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="col-span-12">
-              <label className="block text-sm font-semibold">Observações gerais sobre o equipamento</label>
-              <textarea name="observacoes" value={form.observacoes} onChange={handleFormChange} className="w-full border rounded p-2 h-24" />
-            </div>
-
-            <div className="col-span-12">
-              <label className="block text-sm font-semibold">Problema relatado</label>
-              <textarea name="problemaRelatado" value={form.problemaRelatado} onChange={handleFormChange} className="w-full border rounded p-2 h-20" />
-            </div>
-
-            <div className="col-span-6">
-              <label className="block text-sm font-semibold">Assinatura do cliente</label>
-              <input name="assinaturaCliente" value={form.assinaturaCliente} onChange={handleFormChange} className="w-full border rounded p-2" />
+              <label className="block font-semibold">Nome</label>
+              <input type="text" name="nome" value={form.nome} onChange={handleFormChange} className="border p-1 w-full"/>
             </div>
           </div>
 
+          <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-4">
+              <label className="block font-semibold">RG/CPF</label>
+              <input type="text" name="rgcpf" value={form.rgcpf} onChange={handleFormChange} className="border p-1 w-full"/>
+            </div>
+            <div className="col-span-4">
+              <label className="block font-semibold">Telefone</label>
+              <input type="text" name="telefone" value={form.telefone} onChange={handleFormChange} className="border p-1 w-full"/>
+            </div>
+            <div className="col-span-4 flex items-center gap-2 mt-6">
+              <input type="checkbox" name="whatsapp" checked={form.whatsapp} onChange={handleFormChange}/>
+              <label>WhatsApp</label>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-4">
+              <label className="block font-semibold">Endereço</label>
+              <input type="text" name="endereco" value={form.endereco} onChange={handleFormChange} className="border p-1 w-full"/>
+            </div>
+            <div className="col-span-4">
+              <label className="block font-semibold">IMEI</label>
+              <input type="text" name="imei" value={form.imei} onChange={handleFormChange} className="border p-1 w-full"/>
+            </div>
+            <div className="col-span-4">
+              <label className="block font-semibold">Modelo</label>
+              <input type="text" name="modelo" value={form.modelo} onChange={handleFormChange} className="border p-1 w-full"/>
+            </div>
+          </div>
+          <div className="grid grid-cols-12 gap-4 mt-4">
+            <div className="col-span-6">
+              <label className="block font-semibold">Senha de desbloqueio</label>
+              <input type="text" name="senhaDesbloqueio" value={form.senhaDesbloqueio} onChange={handleFormChange} className="border p-1 w-full"/>
+            </div>
+          {/* Padrão de desbloqueio */}
+          <div className="col-span-12 mt-4">
+            <label className="block font-semibold mb-1">Padrão de desbloqueio</label>
+            <PadraoDesbloqueioAvancado
+              ref={padraoRef}
+              className="PadraoDesbloqueioAvancado"
+              value={form.padraoDesbloqueio}
+              onChange={val => setForm(f => ({ ...f, padraoDesbloqueio: val }))}
+            />
+            <br />
+            <button type="button" className="bg-blue-600 text-white px-4 py-2 rounded mt-2" onClick={limparPadraoDesbloqueio}>Limpar padrão</button>
+          </div>
+
+          {/* Senha, observações e problema relatado */}
+          
+            <div className="col-span-6">
+              <label className="block font-semibold">Assinatura do cliente</label>
+              <input type="text" name="assinaturaCliente" value={form.assinaturaCliente} onChange={handleFormChange} className="border p-1 w-full"/>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-12 gap-4 mt-4">
+            <div className="col-span-6">
+              <label className="block font-semibold">Observações</label>
+              <textarea name="observacoes" value={form.observacoes} onChange={handleFormChange} className="border p-1 w-full"/>
+            </div>
+            <div className="col-span-6">
+              <label className="block font-semibold">Problema relatado</label>
+              <textarea name="problemaRelatado" value={form.problemaRelatado} onChange={handleFormChange} className="border p-1 w-full"/>
+            </div>
+          </div>
+
+          {/* Checklist */}
+          <div className="checklist">
+            {initialChecklist.map(item => (
+              <div key={item} className="checklist-item, flex items-start gap-2">
+                <span className="w-48">{item}</span>
+                <br />
+                <button
+                  type="button"
+                  onClick={() => toggleChecklist(item, "sim")}
+                  className={`px-2 py-1 rounded ${checklist[item]==="sim"?"bg-green-600 text-white":"bg-gray-200"}`}
+                >
+                  Sim
+                </button>
+                <button
+                  type="button"
+                  onClick={() => toggleChecklist(item, "nâo")}
+                  className={`px-2 py-1 rounded ${checklist[item]==="nâo"?"bg-red-600 text-white":"bg-gray-200"}`}
+                >
+                  Não
+                </button>
+              </div>
+            ))}
+          </div>  
+
+
+          {/* Botões finais */}
           <div className="flex justify-end gap-4 mt-6">
             <button type="button" onClick={openPrintable} className="bg-green-600 text-white px-4 py-2 rounded">Imprimir</button>
             <button type="button" onClick={resetForm} className="bg-gray-600 text-white px-4 py-2 rounded">Nova ordem</button>

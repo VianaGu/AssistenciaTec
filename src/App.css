@@ -36,7 +36,7 @@ header p {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 2rem;
+  padding: 1.5rem;
   overflow-y: auto;
 }
 
@@ -45,8 +45,9 @@ form {
   border-radius: 12px;
   box-shadow: 0 6px 20px rgba(0,0,0,0.08);
   padding: 2rem;
-  width: 100%;
-  max-width: 1200px;
+  width: 1400px;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ===== Inputs e textareas ===== */
@@ -93,61 +94,52 @@ button.bg-blue-600 {
   border: none;
 }
 
-button.border {
-  border: 1px solid #d1d5db;
-  background: #fff;
-  color: #111;
+button.bg-green-600 {
+  background-color: #16a34a;
+  color: #fff;
+  border: none;
 }
 
-button.px-4 {
-  padding-left: 1rem;
-  padding-right: 1rem;
+button.bg-gray-600 {
+  background-color: #4b5563;
+  color: #fff;
+  border: none;
 }
-
-button.py-2 {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-}
-
 /* ===== Checklist ===== */
 .checklist {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
+  grid-template-columns: repeat(2, 1fr); /* duas colunas automáticas */
+  gap: 0.75rem; /* espaçamento entre colunas e linhas */
+  margin-top: 1rem;
 }
 
-.checklist div {
+.checklist-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 10px;
-  padding: 4px 0;
 }
 
-.checklist input[type="radio"] {
-  accent-color: #3b82f6;
-  width: 18px;
-  height: 18px;
-}
+
 
 /* ===== Padrão de desbloqueio ===== */
-.relative {
-  touch-action: none;
-}
-
 .grid-cols-3 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  width: 12rem;
-  height: 12rem;
+  gap: 12px;
+  width: 100%;
+  max-width: 16rem;
+  height: auto;
+  aspect-ratio: 1/1;
+  margin: 1rem auto;
   position: relative;
   user-select: none;
 }
 
 .grid-cols-3 div {
-  width: 40px;
-  height: 40px;
+  width: 100%;
+  height: 100%;
+  max-width: 60px;
+  max-height: 60px;
   border: 2px solid #cbd5e1;
   border-radius: 50%;
   background-color: #fff;
@@ -165,8 +157,9 @@ button.py-2 {
   transform: scale(1.1);
 }
 
-.PadraoDesbloqueioAvancado div {
-  transition: all 0.2s ease;
+.PadraoDesbloqueioAvancado div span {
+  font-size: 0.7rem;
+  font-weight: bold;
 }
 
 /* ===== Linhas SVG ===== */
@@ -177,21 +170,13 @@ svg line {
   transition: all 0.2s linear;
 }
 
-/* ===== Footer ===== */
-footer {
-  text-align: center;
-  margin-top: 2rem;
-  font-size: 0.75rem;
-  color: #9ca3af;
-}
-
 /* ===== Impressão ===== */
 @media print {
   body { color:#111; padding:20px; font-family:Arial,Helvetica,sans-serif; }
   h1 { font-size:20px; margin-bottom:8px }
   table { width:100%; border-collapse:collapse; margin-top:8px }
   td,th { border:1px solid #ccc; padding:6px; text-align:left }
-  .checklist { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .checklist { grid-template-columns: 1fr 1fr; gap:8px; }
   .small { font-size:12px; }
   .row { display:flex; gap:12px; }
   .col { flex:1; }
@@ -204,15 +189,14 @@ footer {
 }
 
 @media (max-width: 768px) {
+  .main-container { padding: 1rem; }
+  form { border-radius: 0; box-shadow: none; padding: 1rem; }
   .grid-cols-12 { grid-template-columns: 1fr; }
-  .col-span-6,
-  .col-span-12,
-  .col-span-3,
-  .col-span-4 { grid-column: span 1 / span 1; }
-  .flex.items-end.justify-end.gap-3 {
-    justify-content: flex-start;
-    flex-direction: column;
-    gap: 1rem;
-  }
   .checklist { grid-template-columns: 1fr; }
+  header { text-align: center; }
 }
+
+/* ===== Extras ===== */
+textarea { resize: none; }
+h2 { font-size: 1.125rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+input[readonly] { background-color: #f3f4f6; cursor: not-allowed; }
