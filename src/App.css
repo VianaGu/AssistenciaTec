@@ -4,6 +4,7 @@ html, body, #root {
   margin: 0;
   font-family: 'Inter', sans-serif;
   background: #f4f6fa;
+  color: #111;
 }
 
 body {
@@ -20,11 +21,13 @@ header {
 
 header h1 {
   font-size: 2rem;
+  margin: 0;
 }
 
 header p {
   font-size: 0.875rem;
   color: #e0e7ff;
+  margin-top: 0.25rem;
 }
 
 /* ===== Layout principal ===== */
@@ -54,28 +57,30 @@ textarea {
   border: 1px solid #d1d5db;
   border-radius: 8px;
   padding: 0.5rem 0.75rem;
-  transition: all 0.2s;
   width: 100%;
   font-size: 0.875rem;
+  transition: all 0.3s ease;
 }
 
 input:focus,
 textarea:focus {
   border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
   outline: none;
 }
 
 label {
   font-weight: 600;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
   display: block;
 }
 
 /* ===== Botões ===== */
 button {
   cursor: pointer;
-  transition: all 0.2s;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s ease;
 }
 
 button:hover {
@@ -85,7 +90,7 @@ button:hover {
 button.bg-blue-600 {
   background-color: #3b82f6;
   color: #fff;
-  font-weight: 600;
+  border: none;
 }
 
 button.border {
@@ -116,11 +121,13 @@ button.py-2 {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 2px 0;
+  padding: 4px 0;
 }
 
 .checklist input[type="radio"] {
   accent-color: #3b82f6;
+  width: 18px;
+  height: 18px;
 }
 
 /* ===== Padrão de desbloqueio ===== */
@@ -131,45 +138,35 @@ button.py-2 {
 .grid-cols-3 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  width: 9rem;
-  height: 9rem;
+  gap: 10px;
+  width: 12rem;
+  height: 12rem;
   position: relative;
   user-select: none;
 }
 
 .grid-cols-3 div {
-  width: 30px;
-  height: 30px;
-  border: 2px solid #ccc;
+  width: 40px;
+  height: 40px;
+  border: 2px solid #cbd5e1;
   border-radius: 50%;
+  background-color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  background-color: #fff;
-  transition: background-color 0.2s, transform 0.1s;
+  transition: all 0.2s ease;
 }
 
-.grid-cols-3 div.bg-blue-600 {
+.grid-cols-3 div.bg-blue-600,
+.grid-cols-3 div:hover {
   background-color: #2563eb;
-  color: white;
+  color: #fff;
   transform: scale(1.1);
-}
-
-.grid-cols-3 div span {
-  font-size: 0.7rem;
-  font-weight: bold;
 }
 
 .PadraoDesbloqueioAvancado div {
-  transition: all 0.15s;
-}
-
-.PadraoDesbloqueioAvancado div:hover {
-  transform: scale(1.1);
-  background-color: #2563eb;
-  color: white;
+  transition: all 0.2s ease;
 }
 
 /* ===== Linhas SVG ===== */
@@ -177,7 +174,7 @@ svg line {
   stroke: #2563eb;
   stroke-width: 3;
   stroke-linecap: round;
-  transition: all 0.1s linear;
+  transition: all 0.2s linear;
 }
 
 /* ===== Footer ===== */
@@ -203,28 +200,19 @@ footer {
 
 /* ===== Responsividade ===== */
 @media (max-width: 1024px) {
-  form {
-    padding: 1.5rem;
-  }
+  form { padding: 1.5rem; }
 }
 
 @media (max-width: 768px) {
-  .grid-cols-12 {
-    grid-template-columns: repeat(1, 1fr);
-  }
+  .grid-cols-12 { grid-template-columns: 1fr; }
   .col-span-6,
   .col-span-12,
   .col-span-3,
-  .col-span-4 {
-    grid-column: span 1 / span 1;
-  }
+  .col-span-4 { grid-column: span 1 / span 1; }
   .flex.items-end.justify-end.gap-3 {
     justify-content: flex-start;
     flex-direction: column;
     gap: 1rem;
   }
-
-  .checklist {
-    grid-template-columns: 1fr; /* mobile: 1 coluna */
-  }
+  .checklist { grid-template-columns: 1fr; }
 }
