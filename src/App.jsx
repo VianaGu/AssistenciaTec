@@ -221,7 +221,7 @@ export default function AssistenciaTecnicaForm() {
 
     const html = `
       <html>
-        <head><title>Ordem de Serviço - ${form.nome||""}</title><style>${style}</style></head>
+        <head><title>Ordem de Serviço - ${form.nome||"Sem nome Preenchido"}</title><style>${style}</style></head>
         <body>
           <h1>ASSISTÊNCIA TÉCNICA</h1>
           <div class="row">
@@ -327,11 +327,6 @@ export default function AssistenciaTecnicaForm() {
           </div>
 
           {/* Senha, observações e problema relatado */}
-          
-            <div className="col-span-6">
-              <label className="block font-semibold">Assinatura do cliente</label>
-              <input type="text" name="assinaturaCliente" value={form.assinaturaCliente} onChange={handleFormChange} className="border p-1 w-full"/>
-            </div>
           </div>
 
           <div className="grid grid-cols-12 gap-4 mt-4">
